@@ -1,14 +1,21 @@
-import sys, os
+"""Page 5 — Model optimization, tuning curves, and safety-stock impact."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+from typing import Any
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
-from utils.synthetic_data import BASELINE_MAE, BASELINE_RMSE, BASELINE_BIAS, XGBOOST_MAE, XGBOOST_RMSE, XGBOOST_BIAS
-from utils.domain import safety_stock
+from utils.colors import DANGER, PRIMARY, SUCCESS, WARNING  # noqa: E402
+from utils.domain import safety_stock  # noqa: E402
+from utils.synthetic_data import BASELINE_MAE, XGBOOST_MAE  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — Optimization & Accuracy",
@@ -39,12 +46,11 @@ lr_range   = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3]
 lr_val_mae = [33.5, 31.5, 29.8, 28.5, 28.1, 28.4, 29.0, 30.1, 31.5]
 
 
-
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the optimization page: error metrics, tuning curves, and safety-stock impact."""
     st.markdown("## Model optimization & forecast accuracy")
     st.markdown("Tuning the model, measuring its errors, and translating accuracy into inventory outcomes.")
 
@@ -228,6 +234,7 @@ must be set correctly. These are not learned from data — they control *how* th
 
     fig_lc = go.Figure()
 
+    x_vals: Any
     if tune_param == "Number of trees (n_estimators)":
         x_vals  = n_estimators_range
         x_label = "Number of trees"
@@ -240,7 +247,6 @@ must be set correctly. These are not learned from data — they control *how* th
             line=dict(color=DANGER, width=2), name="Validation error (held-out data)",
         ))
         opt_x = 300
-        opt_y = float(val_mae[np.argmin(np.abs(n_estimators_range - opt_x))])
         fig_lc.add_vline(x=opt_x, line_dash="dash", line_color=SUCCESS,
                          annotation_text=f"Chosen: {opt_x} trees", annotation_position="top right")
 

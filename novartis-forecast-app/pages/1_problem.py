@@ -1,12 +1,18 @@
-import sys, os
+"""Page 1 — Drug shortage crisis context and problem framing."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
+# pylint: disable=import-error
+import pandas as pd  # noqa: E402
+import plotly.express as px  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
+from utils.colors import DANGER, NEUTRAL, PRIMARY, SUCCESS, WARNING  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — The Problem",
@@ -59,8 +65,8 @@ BASELINE_BIAS = "~−10%"
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the problem-framing page: shortage trends, causes, and baseline KPIs."""
     st.markdown("## The drug shortage crisis in France")
     st.markdown(
         "Understanding why accurate demand forecasting "

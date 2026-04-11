@@ -1,12 +1,30 @@
-import sys, os
+"""Page 3 — Algorithm comparison and XGBoost selection rationale."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+from typing import TypedDict
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
+from utils.colors import NEUTRAL, SUCCESS, WARNING  # noqa: E402
+
+
+class _AlgoMeta(TypedDict):
+    mae: int
+    training_speed: int
+    interpretability: int
+    seasonality: int
+    outlier_handling: int
+    color: str
+    description: str
+    icon: str
 
 st.set_page_config(
     page_title="Drug Forecast AI — Model Selection",
@@ -18,7 +36,7 @@ st.set_page_config(
 # ALGORITHM DATA
 # ─────────────────────────────────────────
 
-ALGORITHMS = {
+ALGORITHMS: dict[str, _AlgoMeta] = {
     "Decision Tree": {
         "mae":              42,
         "training_speed":   5,
@@ -162,8 +180,8 @@ benchmark.loc[benchmark["Algorithm"] == "XGBoost", "RMSE"] = 63.0
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the model-selection page: algorithm comparison, radar charts, and benchmark."""
     st.markdown("## Model selection")
     st.markdown("How we chose the right forecasting algorithm — and why it matters for demand planning.")
 
