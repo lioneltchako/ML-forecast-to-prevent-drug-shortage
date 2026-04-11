@@ -8,6 +8,7 @@ import numpy as np
 
 from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
 from utils.synthetic_data import BASELINE_MAE, BASELINE_RMSE, BASELINE_BIAS, XGBOOST_MAE, XGBOOST_RMSE, XGBOOST_BIAS
+from utils.domain import safety_stock
 
 st.set_page_config(
     page_title="Drug Forecast AI — Optimization & Accuracy",
@@ -37,19 +38,6 @@ depth_val   = np.clip(depth_val,   27, 38)
 lr_range   = [0.01, 0.03, 0.05, 0.08, 0.1, 0.15, 0.2, 0.25, 0.3]
 lr_val_mae = [33.5, 31.5, 29.8, 28.5, 28.1, 28.4, 29.0, 30.1, 31.5]
 
-
-# ─────────────────────────────────────────
-# SAFETY STOCK HELPER
-# ─────────────────────────────────────────
-
-def safety_stock(mae_pct: float, avg_demand: float, lead_time: float, service_z: float) -> float:
-    """
-    Safety stock formula:
-        SS = Z × σ_error × √(lead_time)
-    where σ_error ≈ MAE × 1.25 (normal approximation)
-    """
-    sigma = (mae_pct / 100) * avg_demand * 1.25
-    return service_z * sigma * np.sqrt(lead_time)
 
 
 # ─────────────────────────────────────────
@@ -479,4 +467,8 @@ Across the **43 products** in the portfolio:
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

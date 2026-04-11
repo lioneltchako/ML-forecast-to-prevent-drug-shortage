@@ -8,6 +8,7 @@ the real dataset without reproducing any actual figures.
 
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 np.random.seed(42)
 
@@ -73,6 +74,7 @@ def generate_product_sales(
 # FULL DATASET
 # ─────────────────────────────────────────
 
+@st.cache_data(show_spinner=False)
 def build_dataset() -> pd.DataFrame:
     rng = np.random.default_rng(42)
     records = []

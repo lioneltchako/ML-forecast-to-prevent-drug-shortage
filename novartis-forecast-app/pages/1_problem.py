@@ -300,4 +300,8 @@ During the study period, the existing forecasting model showed:
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

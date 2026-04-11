@@ -375,4 +375,8 @@ hour of day, day of week, or month of year.
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

@@ -387,4 +387,8 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

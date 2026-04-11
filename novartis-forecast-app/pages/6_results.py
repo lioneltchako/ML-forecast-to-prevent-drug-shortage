@@ -188,7 +188,7 @@ def render():
         "Model":    ["Baseline"] * 3 + ["XGBoost"] * 3,
     })
 
-    fig_global = px.grouped_bar = go.Figure()
+    fig_global = go.Figure()
     for model, color in [("Baseline", DANGER), ("XGBoost", SUCCESS)]:
         subset = metrics_chart[metrics_chart["Model"] == model]
         fig_global.add_trace(go.Bar(
@@ -409,4 +409,8 @@ def render():
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()
