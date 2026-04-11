@@ -1,10 +1,16 @@
-import sys, os
+"""Page 2 — Synthetic dataset exploration (products, franchises, seasonality)."""
+# pylint: disable=use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
+# pylint: disable=wrong-import-position
+import pandas as pd  # noqa: E402
+import plotly.express as px  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
 from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, FRANCHISE_COLORS_LIST
 from utils.synthetic_data import build_dataset, FRANCHISES, COVID_START, COVID_END
@@ -22,6 +28,7 @@ st.set_page_config(
 
 @st.cache_data(show_spinner=False)
 def get_page_data():
+    """Build the dataset and all derived aggregates used by this page."""
     df = build_dataset()
 
     monthly_agg = (
@@ -59,7 +66,7 @@ def get_page_data():
 # PAGE RENDER
 # ─────────────────────────────────────────
 def render():
-
+    """Render the data-exploration page."""
     st.markdown("## The data")
     st.markdown("Exploring what pharmaceutical sales data looks like before building any model.")
 
@@ -219,11 +226,11 @@ def render():
     product_df = df[df["product_id"] == selected_product].copy()
     product_cv = product_df["cv"].iloc[0]
     if product_cv < 50:
-        vlabel, vcolor = "Stable",          SUCCESS
+        vlabel = "Stable"
     elif product_cv < 100:
-        vlabel, vcolor = "Variable",        WARNING
+        vlabel = "Variable"
     else:
-        vlabel, vcolor = "High volatility", DANGER
+        vlabel = "High volatility"
 
     col_pm1, col_pm2, col_pm3 = st.columns(3)
     col_pm1.metric("Franchise",         selected_franchise)

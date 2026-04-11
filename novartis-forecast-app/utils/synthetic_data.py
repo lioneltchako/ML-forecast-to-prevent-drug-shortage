@@ -6,6 +6,8 @@ seasonality shape, COVID impact, coefficient-of-variation distribution) mirror
 the real dataset without reproducing any actual figures.
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
 import streamlit as st
@@ -51,6 +53,7 @@ def generate_product_sales(
     has_covid_dip: bool = True,
     seed_offset: int = 0,
 ) -> np.ndarray:
+    """Generate a synthetic monthly sales series for a single product."""
     rng = np.random.default_rng(42 + seed_offset)
     t = np.arange(N_MONTHS)
 
@@ -76,11 +79,12 @@ def generate_product_sales(
 
 @st.cache_data(show_spinner=False)
 def build_dataset() -> pd.DataFrame:
+    """Build the full 43-product x 63-month synthetic sales dataset."""
     rng = np.random.default_rng(42)
     records = []
     product_id = 1
     for franchise, meta in FRANCHISES.items():
-        for i in range(meta["products"]):
+        for _ in range(cast(int, meta["products"])):
             base = int(rng.integers(500, 18_000))
             cv_choice = rng.choice(
                 [rng.uniform(0.05, 0.45),
