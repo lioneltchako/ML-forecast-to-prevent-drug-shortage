@@ -237,14 +237,14 @@ def render() -> None:
     with col_fw1:
         st.success(
             "**Where XGBoost wins most:**  \n"
-            "Cardiology and Immunology — stable, high-volume franchises with clear seasonal patterns. "
+            "Franchise A and Franchise D — stable, high-volume franchises with clear seasonal patterns. "
             "The model's demand signals have the most signal to learn from.",
             icon="✅",
         )
     with col_fw2:
         st.warning(
             "**Where improvement is more modest:**  \n"
-            "Solid Tumors and Neuroscience — high-volatility franchises driven by "
+            "Franchise C and Franchise E — high-volatility franchises driven by "
             "exceptional events (clinical decisions, compassionate use, individual patient prescriptions) "
             "that are inherently difficult to forecast from historical data alone.",
             icon="⚠️",
@@ -280,13 +280,13 @@ def render() -> None:
     col_bw1, col_bw2 = st.columns(2)
     with col_bw1:
         st.success(
-            "**Brand-A (Cardiology):** MAE improves from ~24% to ~21% — "
+            "**Brand-A (Franchise A):** MAE improves from approx. 24% to approx. 21% — "
             "a high-volume, stable product where the lag features are extremely predictive.",
             icon="🏆",
         )
     with col_bw2:
         st.warning(
-            "**Brand-J (Neuroscience):** MAE moves from ~45% to ~43% — "
+            "**Brand-J (Franchise E):** MAE moves from approx. 45% to approx. 43% — "
             "very high volatility driven by specialist prescribing patterns. "
             "ML helps at the margin, but a safety stock buffer remains essential.",
             icon="⚡",
@@ -312,9 +312,9 @@ def render() -> None:
         st.markdown("#### Deploy ML forecasting on high-volume, stable products first")
         st.success(
             "**Lowest risk. Fastest inventory impact.**  \n\n"
-            "Stable products (CV < 50%) represent ~33 out of 43 SKUs and the majority of revenue. "
+            "Stable products (CV < 50%) represent approx. 33 out of 43 SKUs and the majority of revenue. "
             "These are exactly where XGBoost performs best — MAE improvements of 3–5 percentage points "
-            "are reliable, and the bias correction (~−10% → ~−1%) immediately reduces systematic under-ordering.  \n\n"
+            "are reliable, and the bias correction (approx. −10% → approx. −1%) immediately reduces systematic under-ordering.  \n\n"
             "**Action:** Run XGBoost forecasts in parallel with the existing model for 2 planning cycles. "
             "Compare against actuals. Replace the existing model where XGBoost consistently wins.",
             icon="🚀",
@@ -329,7 +329,7 @@ def render() -> None:
         st.markdown("#### For high-volatility products, combine ML forecast with a safety stock buffer")
         st.warning(
             "**The model improves accuracy — but cannot fully predict exceptional events.**  \n\n"
-            "High-volatility products (Neuroscience, Solid Tumors) have demand driven by factors "
+            "High-volatility products (Franchise E, Franchise C) have demand driven by factors "
             "outside any historical pattern: single prescriber decisions, compassionate use, "
             "or sudden therapeutic guideline changes.  \n\n"
             "XGBoost still reduces bias and improves average accuracy, but the residual error "
@@ -389,7 +389,7 @@ def render() -> None:
 
     with col_sum2:
         st.success(
-            "**Overall:**  \nML forecasting reduces forecast error by **~9%** "
+            "**Overall:**  \nML forecasting reduces forecast error by **approx. 9%** "
             "while systematically correcting the underestimation bias of the existing model.  \n\n"
             "For a portfolio of 43 products, this translates to a **measurable reduction in "
             "safety stock requirements** at the same service level — and a lower risk of "

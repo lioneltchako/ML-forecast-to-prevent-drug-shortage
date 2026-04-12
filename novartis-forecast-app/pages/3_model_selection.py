@@ -221,11 +221,11 @@ benchmark.loc[benchmark["Algorithm"] == "XGBoost", "RMSE"] = 63.0
 # KPI BENCHMARK DATA (synthetic — page transparency note applies)
 # ─────────────────────────────────────────
 kpi_benchmark = pd.DataFrame([
-    {"Algorithm": "Random Forest",     "~Bias (%)": -4.8, "~MAE": 142, "~RMSE": 187},
-    {"Algorithm": "Gradient Boosting", "~Bias (%)": -3.1, "~MAE": 118, "~RMSE": 161},
-    {"Algorithm": "XGBoost ✅",         "~Bias (%)": -1.0, "~MAE":  91, "~RMSE": 134},
-    {"Algorithm": "LightGBM",          "~Bias (%)": -2.4, "~MAE": 107, "~RMSE": 152},
-    {"Algorithm": "CatBoost",          "~Bias (%)": -3.6, "~MAE": 115, "~RMSE": 163},
+    {"Algorithm": "Random Forest",     "Bias (%)": -4.8, "MAE": 142, "RMSE": 187},
+    {"Algorithm": "Gradient Boosting", "Bias (%)": -3.1, "MAE": 118, "RMSE": 161},
+    {"Algorithm": "XGBoost ✅",         "Bias (%)": -1.0, "MAE":  91, "RMSE": 134},
+    {"Algorithm": "LightGBM",          "Bias (%)": -2.4, "MAE": 107, "RMSE": 152},
+    {"Algorithm": "CatBoost",          "Bias (%)": -3.6, "MAE": 115, "RMSE": 163},
 ])
 
 
@@ -271,7 +271,7 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
 
     with col_why2:
         st.info(
-            "The existing model at the study company had a **~−10% systematic bias** — "
+            "The existing model at the study company had a **approx. −10% systematic bias** — "
             "it consistently under-ordered, leading directly to stock-out risk. "
             "Simple models cannot self-correct this kind of structural error.",
             icon="📉",
@@ -279,7 +279,7 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
         st.markdown("")
         st.success(
             "Machine learning approaches, and XGBoost in particular, reduced that bias "
-            "from **~−10% to ~−1%** — a near-complete elimination of systematic "
+            "from **approx. −10% to approx. −1%** — a near-complete elimination of systematic "
             "underestimation.",
             icon="✅",
         )
@@ -321,18 +321,18 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
 
     # Metric cards: bias and MAE improvement vs legacy
     col_bk1, col_bk2, col_bk3 = st.columns(3)
-    col_bk1.metric("XGBoost ~Bias",  "~−1.0%", "−9% vs legacy (~−10%)", delta_color="normal")
-    col_bk2.metric("XGBoost ~MAE",   "~91",    "−51 units vs Random Forest (~142)", delta_color="normal")
-    col_bk3.metric("XGBoost ~RMSE",  "~134",   "−53 vs Random Forest (~187)", delta_color="normal")
+    col_bk1.metric("XGBoost Bias",  "approx. −1.0%", "−9 pp vs legacy (approx. −10%)", delta_color="normal")
+    col_bk2.metric("XGBoost MAE",   "approx. 91",    "−51 units vs Random Forest (approx. 142)", delta_color="normal")
+    col_bk3.metric("XGBoost RMSE",  "approx. 134",   "−53 vs Random Forest (approx. 187)", delta_color="normal")
 
     # Styled KPI table
     kpi_styled = (
         kpi_benchmark.style
-        .apply(_col_gradient, higher_is_better=False, use_abs=True, subset=["~Bias (%)"])
-        .apply(_col_gradient, higher_is_better=False, subset=["~MAE"])
-        .apply(_col_gradient, higher_is_better=False, subset=["~RMSE"])
+        .apply(_col_gradient, higher_is_better=False, use_abs=True, subset=["Bias (%)"])
+        .apply(_col_gradient, higher_is_better=False, subset=["MAE"])
+        .apply(_col_gradient, higher_is_better=False, subset=["RMSE"])
         .apply(_highlight_winner, axis=1)
-        .format({"~Bias (%)": "{:+.1f}%", "~MAE": "{:.0f}", "~RMSE": "{:.0f}"})
+        .format({"Bias (%)": "{:+.1f}%", "MAE": "{:.0f}", "RMSE": "{:.0f}"})
     )
     st.dataframe(kpi_styled, use_container_width=True, hide_index=True)
 
@@ -343,14 +343,14 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
     ]
     fig_kpi = go.Figure(go.Bar(
         x=kpi_benchmark["Algorithm"],
-        y=kpi_benchmark["~MAE"],
+        y=kpi_benchmark["MAE"],
         marker_color=kpi_colors,
-        text=[f"~{v:.0f}" for v in kpi_benchmark["~MAE"]],
+        text=[f"approx. {v:.0f}" for v in kpi_benchmark["MAE"]],
         textposition="outside",
     ))
     fig_kpi.add_hline(
         y=91, line_dash="dash", line_color=SUCCESS,
-        annotation_text="XGBoost ~91 MAE", annotation_position="top right",
+        annotation_text="XGBoost MAE: approx. 91", annotation_position="top right",
     )
     fig_kpi.update_layout(
         height=300,
@@ -366,13 +366,13 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
     col_kb1, col_kb2 = st.columns(2)
     with col_kb1:
         st.success(
-            "**XGBoost achieved the lowest bias (~−1%)** — down from ~−10% with the legacy model. "
+            "**XGBoost achieved the lowest bias (approx. −1%)** — down from approx. −10% with the legacy model. "
             "This nearly eliminates systematic under-ordering.",
             icon="⚖️",
         )
     with col_kb2:
         st.success(
-            "**XGBoost led on both error metrics** — ~91 MAE and ~134 RMSE "
+            "**XGBoost led on both error metrics** — approx. 91 MAE and approx. 134 RMSE "
             "vs 107–142 and 152–187 for other models.",
             icon="🏆",
         )
@@ -449,13 +449,13 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
             x=benchmark["Algorithm"],
             y=benchmark["MAE"],
             marker_color=benchmark["Color"].tolist(),
-            text=[f"~{v:.0f}%" for v in benchmark["MAE"]],
+            text=[f"approx. {v:.0f}%" for v in benchmark["MAE"]],
             textposition="outside",
             name="MAE",
         ))
         fig_bench.add_hline(
             y=28, line_dash="dash", line_color=SUCCESS,
-            annotation_text="XGBoost target (~28%)",
+            annotation_text="XGBoost target (approx. 28%)",
             annotation_position="top right",
         )
         fig_bench.update_layout(
@@ -476,9 +476,9 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
             if row["Algorithm"] == "XGBoost":
                 st.success(f"**{row['Algorithm']}** — ~{row['MAE']:.0f}% MAE — **Winner**", icon="🏆")
             elif delta_vs_xgb <= 8:
-                st.info(f"**{row['Algorithm']}** — ~{row['MAE']:.0f}% MAE — +{delta_vs_xgb:.0f}pp vs XGBoost")
+                st.info(f"**{row['Algorithm']}** — approx. {row['MAE']:.0f}% MAE — +{delta_vs_xgb:.0f}pp vs XGBoost")
             else:
-                st.error(f"**{row['Algorithm']}** — ~{row['MAE']:.0f}% MAE — +{delta_vs_xgb:.0f}pp vs XGBoost")
+                st.error(f"**{row['Algorithm']}** — approx. {row['MAE']:.0f}% MAE — +{delta_vs_xgb:.0f}pp vs XGBoost")
 
     st.divider()
 
@@ -489,14 +489,14 @@ hold up reasonably. But for the rest, three challenges make them inadequate:
     with col_j1:
         st.success(
             "**Best forecast accuracy**  \n"
-            "~28% MAE vs ~34–42% for alternatives — "
+            "approx. 28% MAE vs approx. 34–42% for alternatives — "
             "directly translates to lower safety stock requirements.",
             icon="🎯",
         )
     with col_j2:
         st.success(
             "**Corrects systematic bias**  \n"
-            "Reduces the underestimation bias from ~−10% to ~−1% — "
+            "Reduces the underestimation bias from approx. −10% to approx. −1% — "
             "the single most impactful improvement for stock-out prevention.",
             icon="⚖️",
         )

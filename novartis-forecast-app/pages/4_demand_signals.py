@@ -52,7 +52,7 @@ These are the **lag variables** — past sales values fed directly into the mode
 
 **Why these dominate:** Pharmaceutical demand is highly autocorrelated.
 Knowing what sold last month is by far the best predictor of what will sell next month.
-Combined, historical consumption patterns explain ~70% of total feature importance.
+Combined, historical consumption patterns explain approx. 70% of total feature importance.
 """,
     },
     "Seasonality": {
@@ -154,10 +154,10 @@ directly determines how accurate the forecasts will be.
 In this study, **17 demand signals** were engineered across 4 categories:
 """)
         col_c1, col_c2, col_c3, col_c4 = st.columns(4)
-        col_c1.metric("Historical patterns", "8 signals", "~70% of importance")
-        col_c2.metric("Seasonality",          "3 signals", "~11% of importance")
-        col_c3.metric("Event flags",          "4 signals", "~11% of importance")
-        col_c4.metric("Product context",      "2 signals", "~4% of importance")
+        col_c1.metric("Historical patterns", "8 signals", "approx. 70% of importance")
+        col_c2.metric("Seasonality",          "3 signals", "approx. 11% of importance")
+        col_c3.metric("Event flags",          "4 signals", "approx. 11% of importance")
+        col_c4.metric("Product context",      "2 signals", "approx. 4% of importance")
 
     with col_intro2:
         st.info(
