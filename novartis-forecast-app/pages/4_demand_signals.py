@@ -1,13 +1,18 @@
-import sys, os
+"""Page 4 — Feature engineering: demand signals and their relative importance."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
-from utils.synthetic_data import FEATURE_IMPORTANCE
+from utils.colors import DANGER, NEUTRAL, PRIMARY, WARNING  # noqa: E402
+from utils.synthetic_data import FEATURE_IMPORTANCE  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — Demand Signals",
@@ -118,8 +123,8 @@ Without this context, the model would be forced to treat them identically.
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the demand-signals page: feature categories, sin/cos encoding, and importance chart."""
     st.markdown("## Demand signals")
     st.markdown(
         "What information drives forecast accuracy — "
@@ -375,4 +380,8 @@ hour of day, day of week, or month of year.
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

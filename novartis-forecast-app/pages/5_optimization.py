@@ -1,13 +1,21 @@
-import sys, os
+"""Page 5 — Model optimization, tuning curves, and safety-stock impact."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+from typing import Any
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
-from utils.synthetic_data import BASELINE_MAE, BASELINE_RMSE, BASELINE_BIAS, XGBOOST_MAE, XGBOOST_RMSE, XGBOOST_BIAS
+from utils.colors import DANGER, PRIMARY, SUCCESS, WARNING  # noqa: E402
+from utils.domain import safety_stock  # noqa: E402
+from utils.synthetic_data import BASELINE_MAE, XGBOOST_MAE  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — Optimization & Accuracy",
@@ -39,24 +47,10 @@ lr_val_mae = [33.5, 31.5, 29.8, 28.5, 28.1, 28.4, 29.0, 30.1, 31.5]
 
 
 # ─────────────────────────────────────────
-# SAFETY STOCK HELPER
-# ─────────────────────────────────────────
-
-def safety_stock(mae_pct: float, avg_demand: float, lead_time: float, service_z: float) -> float:
-    """
-    Safety stock formula:
-        SS = Z × σ_error × √(lead_time)
-    where σ_error ≈ MAE × 1.25 (normal approximation)
-    """
-    sigma = (mae_pct / 100) * avg_demand * 1.25
-    return service_z * sigma * np.sqrt(lead_time)
-
-
-# ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the optimization page: error metrics, tuning curves, and safety-stock impact."""
     st.markdown("## Model optimization & forecast accuracy")
     st.markdown("Tuning the model, measuring its errors, and translating accuracy into inventory outcomes.")
 
@@ -240,6 +234,7 @@ must be set correctly. These are not learned from data — they control *how* th
 
     fig_lc = go.Figure()
 
+    x_vals: Any
     if tune_param == "Number of trees (n_estimators)":
         x_vals  = n_estimators_range
         x_label = "Number of trees"
@@ -252,7 +247,6 @@ must be set correctly. These are not learned from data — they control *how* th
             line=dict(color=DANGER, width=2), name="Validation error (held-out data)",
         ))
         opt_x = 300
-        opt_y = float(val_mae[np.argmin(np.abs(n_estimators_range - opt_x))])
         fig_lc.add_vline(x=opt_x, line_dash="dash", line_color=SUCCESS,
                          annotation_text=f"Chosen: {opt_x} trees", annotation_position="top right")
 
@@ -479,4 +473,8 @@ Across the **43 products** in the portfolio:
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

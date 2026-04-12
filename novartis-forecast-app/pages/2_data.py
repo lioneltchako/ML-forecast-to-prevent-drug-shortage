@@ -1,13 +1,19 @@
-import sys, os
+"""Page 2 — Synthetic dataset exploration (products, franchises, seasonality)."""
+# pylint: disable=use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-import numpy as np
+# pylint: disable=wrong-import-position
+import pandas as pd  # noqa: E402
+import plotly.express as px  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL, FRANCHISE_COLORS
+from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, FRANCHISE_COLORS_LIST
+from utils.synthetic_data import build_dataset, FRANCHISES, COVID_START, COVID_END
 
 st.set_page_config(
     page_title="Drug Forecast AI — The Data",
@@ -15,93 +21,52 @@ st.set_page_config(
     layout="wide",
 )
 
-np.random.seed(42)
 
 # ─────────────────────────────────────────
-# SYNTHETIC DATA GENERATION
+# DERIVED DATA (cached — runs once per session)
 # ─────────────────────────────────────────
 
-FRANCHISES = {
-    "Cardiology":   {"products": 19, "color": "#185FA5", "share": 44.88},
-    "Hematology":   {"products":  7, "color": "#1D9E75", "share": 15.63},
-    "Solid Tumors": {"products":  7, "color": "#E24B4A", "share": 15.63},
-    "Immunology":   {"products":  6, "color": "#BA7517", "share": 13.58},
-    "Neuroscience": {"products":  4, "color": "#AFA9EC", "share": 10.28},
-}
+@st.cache_data(show_spinner=False)
+def get_page_data():
+    """Build the dataset and all derived aggregates used by this page."""
+    df = build_dataset()
 
-MONTHS      = pd.date_range(start="2018-01-01", end="2023-03-01", freq="MS")
-N_MONTHS    = len(MONTHS)
-COVID_START = "2020-01-01"
-COVID_END   = "2021-07-01"
-FRANCHISE_COLORS_LIST = [m["color"] for m in FRANCHISES.values()]
+    monthly_agg = (
+        df.groupby("date")["sales"].sum().reset_index()
+        .rename(columns={"sales": "total_sales"})
+    )
 
+    monthly_avg = (
+        df.assign(month=df["date"].dt.month)
+        .groupby("month")["sales"].mean().reset_index()
+        .rename(columns={"sales": "avg_sales"})
+    )
+    monthly_avg["month_name"] = (
+        pd.to_datetime(monthly_avg["month"], format="%m").dt.strftime("%b")
+    )
 
-def generate_product_sales(base_volume, cv, franchise, has_covid_dip=True):
-    t          = np.arange(N_MONTHS)
-    trend      = base_volume * (1 + 0.004 * t)
-    phase      = {"Immunology": np.pi / 6, "Neuroscience": np.pi / 3}.get(franchise, 0)
-    seasonality = 1 + 0.12 * np.sin(2 * np.pi * t / 12 + phase)
-    covid_mask  = np.ones(N_MONTHS)
-    if has_covid_dip:
-        covid_mask[24:43] = np.linspace(1.0, 0.72, 19)
-        covid_mask[43:50] = np.linspace(0.72, 1.0, 7)
-    noise = np.random.normal(1, cv * 0.3, N_MONTHS)
-    noise = np.clip(noise, 0.3, 2.5)
-    return np.maximum(trend * seasonality * covid_mask * noise, 0).astype(int)
+    cv_dist = (
+        df[["product_id", "cv"]].drop_duplicates()
+        .assign(segment=lambda x: pd.cut(
+            x["cv"],
+            bins=[0, 50, 100, 200],
+            labels=["Stable (CV < 50%)", "Variable (50–100%)", "High volatility (CV > 100%)"],
+        ))
+    )
 
+    franchise_dist = pd.DataFrame([
+        {"franchise": f, "share": m["share"], "products": m["products"]}
+        for f, m in FRANCHISES.items()
+    ])
 
-records    = []
-product_id = 1
-for franchise, meta in FRANCHISES.items():
-    for _ in range(meta["products"]):
-        base = np.random.randint(500, 18_000)
-        cv   = np.random.choice(
-            [np.random.uniform(0.05, 0.45),
-             np.random.uniform(0.50, 0.95),
-             np.random.uniform(1.00, 1.60)],
-            p=[0.77, 0.07, 0.16],
-        )
-        sales = generate_product_sales(base, cv, franchise)
-        for i, date in enumerate(MONTHS):
-            records.append({
-                "product_id": f"P{product_id:03d}",
-                "franchise":  franchise,
-                "date":       date,
-                "sales":      sales[i],
-                "cv":         round(cv * 100, 1),
-            })
-        product_id += 1
-
-df = pd.DataFrame(records)
-
-monthly_agg = df.groupby("date")["sales"].sum().reset_index().rename(columns={"sales": "total_sales"})
-monthly_avg = (
-    df.assign(month=df["date"].dt.month)
-    .groupby("month")["sales"].mean().reset_index()
-    .rename(columns={"sales": "avg_sales"})
-)
-monthly_avg["month_name"] = pd.to_datetime(monthly_avg["month"], format="%m").dt.strftime("%b")
-
-cv_dist = (
-    df[["product_id", "cv"]].drop_duplicates()
-    .assign(segment=lambda x: pd.cut(
-        x["cv"],
-        bins=[0, 50, 100, 200],
-        labels=["Stable (CV < 50%)", "Variable (50–100%)", "High volatility (CV > 100%)"],
-    ))
-)
-
-franchise_dist = pd.DataFrame([
-    {"franchise": f, "share": m["share"], "products": m["products"]}
-    for f, m in FRANCHISES.items()
-])
+    return df, monthly_agg, monthly_avg, cv_dist, franchise_dist
 
 
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
 def render():
-
+    """Render the data-exploration page."""
     st.markdown("## The data")
     st.markdown("Exploring what pharmaceutical sales data looks like before building any model.")
 
@@ -114,6 +79,12 @@ def render():
         icon="⚠️",
     )
     st.divider()
+
+    try:
+        df, monthly_agg, monthly_avg, cv_dist, franchise_dist = get_page_data()
+    except Exception as e:
+        st.error(f"Failed to load data: {e}")
+        st.stop()
 
     # ── Dataset overview ──────────────────
     st.markdown("### Dataset overview")
@@ -252,20 +223,21 @@ def render():
         products_in_franchise = df[df["franchise"] == selected_franchise]["product_id"].unique()
         selected_product = st.selectbox("Product", options=sorted(products_in_franchise))
 
-    product_df  = df[df["product_id"] == selected_product].copy()
-    product_cv  = product_df["cv"].iloc[0]
+    product_df = df[df["product_id"] == selected_product].copy()
+    product_cv = product_df["cv"].iloc[0]
     if product_cv < 50:
-        vlabel, vcolor = "Stable",          SUCCESS
+        vlabel = "Stable"
     elif product_cv < 100:
-        vlabel, vcolor = "Variable",        WARNING
+        vlabel = "Variable"
     else:
-        vlabel, vcolor = "High volatility", DANGER
+        vlabel = "High volatility"
 
     col_pm1, col_pm2, col_pm3 = st.columns(3)
-    col_pm1.metric("Franchise",          selected_franchise)
-    col_pm2.metric("CV",                 f"{product_cv}%", vlabel)
-    col_pm3.metric("Avg monthly sales",  f"{int(product_df['sales'].mean()):,} units")
+    col_pm1.metric("Franchise",         selected_franchise)
+    col_pm2.metric("CV",                f"{product_cv}%", vlabel)
+    col_pm3.metric("Avg monthly sales", f"{int(product_df['sales'].mean()):,} units")
 
+    franchise_list = list(FRANCHISES.keys())
     fig_prod = go.Figure()
     fig_prod.add_vrect(
         x0=COVID_START, x1=COVID_END, fillcolor="#FAECE7", opacity=0.4,
@@ -275,7 +247,7 @@ def render():
     fig_prod.add_trace(go.Scatter(
         x=product_df["date"], y=product_df["sales"],
         mode="lines+markers", marker=dict(size=4),
-        line=dict(color=FRANCHISE_COLORS_LIST[list(FRANCHISES).index(selected_franchise)], width=2),
+        line=dict(color=FRANCHISE_COLORS_LIST[franchise_list.index(selected_franchise)], width=2),
         name=selected_product,
     ))
     fig_prod.update_layout(

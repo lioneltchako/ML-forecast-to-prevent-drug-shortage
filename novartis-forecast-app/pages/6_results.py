@@ -1,17 +1,22 @@
-import sys, os
+"""Page 6 — Results, franchise/brand heatmaps, and actionable recommendations."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL, FRANCHISE_COLORS
-from utils.synthetic_data import (
-    BASELINE_MAE, BASELINE_RMSE, BASELINE_BIAS,
-    XGBOOST_MAE,  XGBOOST_RMSE,  XGBOOST_BIAS,
-    FRANCHISE_RESULTS, BRAND_RESULTS,
+from utils.colors import DANGER, SUCCESS, WARNING  # noqa: E402
+from utils.synthetic_data import (  # noqa: E402
+    BASELINE_BIAS, BASELINE_MAE, BASELINE_RMSE,
+    BRAND_RESULTS, FRANCHISE_RESULTS,
+    XGBOOST_BIAS, XGBOOST_MAE, XGBOOST_RMSE,
 )
 
 st.set_page_config(
@@ -90,8 +95,8 @@ def build_heatmap(results_df: pd.DataFrame, group_col: str) -> go.Figure:
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the results page: global KPIs, franchise/brand heatmaps, recommendations."""
     st.markdown("## Results & recommendations")
     st.markdown(
         "Did the ML model deliver — and what should the business do next?"
@@ -188,7 +193,7 @@ def render():
         "Model":    ["Baseline"] * 3 + ["XGBoost"] * 3,
     })
 
-    fig_global = px.grouped_bar = go.Figure()
+    fig_global = go.Figure()
     for model, color in [("Baseline", DANGER), ("XGBoost", SUCCESS)]:
         subset = metrics_chart[metrics_chart["Model"] == model]
         fig_global.add_trace(go.Bar(
@@ -409,4 +414,8 @@ def render():
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()
