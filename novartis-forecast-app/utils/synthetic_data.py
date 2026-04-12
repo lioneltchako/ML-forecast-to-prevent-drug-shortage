@@ -6,8 +6,11 @@ seasonality shape, COVID impact, coefficient-of-variation distribution) mirror
 the real dataset without reproducing any actual figures.
 """
 
+from typing import cast
+
 import numpy as np
 import pandas as pd
+import streamlit as st
 
 np.random.seed(42)
 
@@ -16,11 +19,11 @@ np.random.seed(42)
 # ─────────────────────────────────────────
 
 FRANCHISES = {
-    "Cardiology":   {"products": 19, "color": "#185FA5", "share": 44.88},
-    "Hematology":   {"products":  7, "color": "#1D9E75", "share": 15.63},
-    "Solid Tumors": {"products":  7, "color": "#E24B4A", "share": 15.63},
-    "Immunology":   {"products":  6, "color": "#BA7517", "share": 13.58},
-    "Neuroscience": {"products":  4, "color": "#AFA9EC", "share": 10.28},
+    "Franchise A": {"products": 19, "color": "#185FA5", "share": 44.88},
+    "Franchise B": {"products":  7, "color": "#1D9E75", "share": 15.63},
+    "Franchise C": {"products":  7, "color": "#E24B4A", "share": 15.63},
+    "Franchise D": {"products":  6, "color": "#BA7517", "share": 13.58},
+    "Franchise E": {"products":  4, "color": "#AFA9EC", "share": 10.28},
 }
 
 MONTHS = pd.date_range(start="2018-01-01", end="2023-03-01", freq="MS")
@@ -50,11 +53,12 @@ def generate_product_sales(
     has_covid_dip: bool = True,
     seed_offset: int = 0,
 ) -> np.ndarray:
+    """Generate a synthetic monthly sales series for a single product."""
     rng = np.random.default_rng(42 + seed_offset)
     t = np.arange(N_MONTHS)
 
     trend      = base_volume * (1 + 0.004 * t)
-    phase      = {"Immunology": np.pi / 6, "Neuroscience": np.pi / 3}.get(franchise, 0)
+    phase      = {"Franchise D": np.pi / 6, "Franchise E": np.pi / 3}.get(franchise, 0)
     seasonality = 1 + 0.12 * np.sin(2 * np.pi * t / 12 + phase)
 
     covid_mask = np.ones(N_MONTHS)
@@ -73,12 +77,14 @@ def generate_product_sales(
 # FULL DATASET
 # ─────────────────────────────────────────
 
+@st.cache_data(show_spinner=False)
 def build_dataset() -> pd.DataFrame:
+    """Build the full 43-product x 63-month synthetic sales dataset."""
     rng = np.random.default_rng(42)
     records = []
     product_id = 1
     for franchise, meta in FRANCHISES.items():
-        for i in range(meta["products"]):
+        for _ in range(cast(int, meta["products"])):
             base = int(rng.integers(500, 18_000))
             cv_choice = rng.choice(
                 [rng.uniform(0.05, 0.45),
@@ -138,16 +144,16 @@ FEATURE_IMPORTANCE["importance"] = (
 # ─────────────────────────────────────────
 
 FRANCHISE_RESULTS = pd.DataFrame([
-    {"franchise": "Cardiology",   "model": "Baseline", "MAE": 28, "RMSE": 65, "Bias": -8},
-    {"franchise": "Cardiology",   "model": "XGBoost",  "MAE": 25, "RMSE": 58, "Bias": -1},
-    {"franchise": "Hematology",   "model": "Baseline", "MAE": 32, "RMSE": 72, "Bias": -11},
-    {"franchise": "Hematology",   "model": "XGBoost",  "MAE": 29, "RMSE": 65, "Bias": -2},
-    {"franchise": "Solid Tumors", "model": "Baseline", "MAE": 38, "RMSE": 80, "Bias": -13},
-    {"franchise": "Solid Tumors", "model": "XGBoost",  "MAE": 35, "RMSE": 76, "Bias": -4},
-    {"franchise": "Immunology",   "model": "Baseline", "MAE": 30, "RMSE": 68, "Bias": -9},
-    {"franchise": "Immunology",   "model": "XGBoost",  "MAE": 27, "RMSE": 62, "Bias": -2},
-    {"franchise": "Neuroscience", "model": "Baseline", "MAE": 42, "RMSE": 88, "Bias": -15},
-    {"franchise": "Neuroscience", "model": "XGBoost",  "MAE": 39, "RMSE": 83, "Bias": -4},
+    {"franchise": "Franchise A", "model": "Baseline", "MAE": 28, "RMSE": 65, "Bias": -8},
+    {"franchise": "Franchise A", "model": "XGBoost",  "MAE": 25, "RMSE": 58, "Bias": -1},
+    {"franchise": "Franchise B", "model": "Baseline", "MAE": 32, "RMSE": 72, "Bias": -11},
+    {"franchise": "Franchise B", "model": "XGBoost",  "MAE": 29, "RMSE": 65, "Bias": -2},
+    {"franchise": "Franchise C", "model": "Baseline", "MAE": 38, "RMSE": 80, "Bias": -13},
+    {"franchise": "Franchise C", "model": "XGBoost",  "MAE": 35, "RMSE": 76, "Bias": -4},
+    {"franchise": "Franchise D", "model": "Baseline", "MAE": 30, "RMSE": 68, "Bias": -9},
+    {"franchise": "Franchise D", "model": "XGBoost",  "MAE": 27, "RMSE": 62, "Bias": -2},
+    {"franchise": "Franchise E", "model": "Baseline", "MAE": 42, "RMSE": 88, "Bias": -15},
+    {"franchise": "Franchise E", "model": "XGBoost",  "MAE": 39, "RMSE": 83, "Bias": -4},
 ])
 
 # ─────────────────────────────────────────
@@ -155,24 +161,24 @@ FRANCHISE_RESULTS = pd.DataFrame([
 # ─────────────────────────────────────────
 
 BRAND_RESULTS = pd.DataFrame([
-    {"brand": "Brand-A", "franchise": "Cardiology",   "model": "Baseline", "MAE": 24, "RMSE": 60, "Bias": -6},
-    {"brand": "Brand-A", "franchise": "Cardiology",   "model": "XGBoost",  "MAE": 21, "RMSE": 55, "Bias": -1},
-    {"brand": "Brand-B", "franchise": "Cardiology",   "model": "Baseline", "MAE": 30, "RMSE": 68, "Bias": -9},
-    {"brand": "Brand-B", "franchise": "Cardiology",   "model": "XGBoost",  "MAE": 27, "RMSE": 61, "Bias": -2},
-    {"brand": "Brand-C", "franchise": "Hematology",   "model": "Baseline", "MAE": 35, "RMSE": 75, "Bias": -12},
-    {"brand": "Brand-C", "franchise": "Hematology",   "model": "XGBoost",  "MAE": 31, "RMSE": 68, "Bias": -3},
-    {"brand": "Brand-D", "franchise": "Hematology",   "model": "Baseline", "MAE": 29, "RMSE": 70, "Bias": -10},
-    {"brand": "Brand-D", "franchise": "Hematology",   "model": "XGBoost",  "MAE": 26, "RMSE": 63, "Bias": -2},
-    {"brand": "Brand-E", "franchise": "Solid Tumors", "model": "Baseline", "MAE": 40, "RMSE": 82, "Bias": -14},
-    {"brand": "Brand-E", "franchise": "Solid Tumors", "model": "XGBoost",  "MAE": 36, "RMSE": 78, "Bias": -5},
-    {"brand": "Brand-F", "franchise": "Solid Tumors", "model": "Baseline", "MAE": 36, "RMSE": 78, "Bias": -12},
-    {"brand": "Brand-F", "franchise": "Solid Tumors", "model": "XGBoost",  "MAE": 34, "RMSE": 74, "Bias": -3},
-    {"brand": "Brand-G", "franchise": "Immunology",   "model": "Baseline", "MAE": 28, "RMSE": 65, "Bias": -8},
-    {"brand": "Brand-G", "franchise": "Immunology",   "model": "XGBoost",  "MAE": 25, "RMSE": 59, "Bias": -2},
-    {"brand": "Brand-H", "franchise": "Immunology",   "model": "Baseline", "MAE": 33, "RMSE": 71, "Bias": -11},
-    {"brand": "Brand-H", "franchise": "Immunology",   "model": "XGBoost",  "MAE": 30, "RMSE": 65, "Bias": -3},
-    {"brand": "Brand-I", "franchise": "Neuroscience", "model": "Baseline", "MAE": 38, "RMSE": 82, "Bias": -13},
-    {"brand": "Brand-I", "franchise": "Neuroscience", "model": "XGBoost",  "MAE": 35, "RMSE": 79, "Bias": -3},
-    {"brand": "Brand-J", "franchise": "Neuroscience", "model": "Baseline", "MAE": 45, "RMSE": 93, "Bias": -17},
-    {"brand": "Brand-J", "franchise": "Neuroscience", "model": "XGBoost",  "MAE": 43, "RMSE": 87, "Bias": -5},
+    {"brand": "Brand-A", "franchise": "Franchise A", "model": "Baseline", "MAE": 24, "RMSE": 60, "Bias": -6},
+    {"brand": "Brand-A", "franchise": "Franchise A", "model": "XGBoost",  "MAE": 21, "RMSE": 55, "Bias": -1},
+    {"brand": "Brand-B", "franchise": "Franchise A", "model": "Baseline", "MAE": 30, "RMSE": 68, "Bias": -9},
+    {"brand": "Brand-B", "franchise": "Franchise A", "model": "XGBoost",  "MAE": 27, "RMSE": 61, "Bias": -2},
+    {"brand": "Brand-C", "franchise": "Franchise B", "model": "Baseline", "MAE": 35, "RMSE": 75, "Bias": -12},
+    {"brand": "Brand-C", "franchise": "Franchise B", "model": "XGBoost",  "MAE": 31, "RMSE": 68, "Bias": -3},
+    {"brand": "Brand-D", "franchise": "Franchise B", "model": "Baseline", "MAE": 29, "RMSE": 70, "Bias": -10},
+    {"brand": "Brand-D", "franchise": "Franchise B", "model": "XGBoost",  "MAE": 26, "RMSE": 63, "Bias": -2},
+    {"brand": "Brand-E", "franchise": "Franchise C", "model": "Baseline", "MAE": 40, "RMSE": 82, "Bias": -14},
+    {"brand": "Brand-E", "franchise": "Franchise C", "model": "XGBoost",  "MAE": 36, "RMSE": 78, "Bias": -5},
+    {"brand": "Brand-F", "franchise": "Franchise C", "model": "Baseline", "MAE": 36, "RMSE": 78, "Bias": -12},
+    {"brand": "Brand-F", "franchise": "Franchise C", "model": "XGBoost",  "MAE": 34, "RMSE": 74, "Bias": -3},
+    {"brand": "Brand-G", "franchise": "Franchise D", "model": "Baseline", "MAE": 28, "RMSE": 65, "Bias": -8},
+    {"brand": "Brand-G", "franchise": "Franchise D", "model": "XGBoost",  "MAE": 25, "RMSE": 59, "Bias": -2},
+    {"brand": "Brand-H", "franchise": "Franchise D", "model": "Baseline", "MAE": 33, "RMSE": 71, "Bias": -11},
+    {"brand": "Brand-H", "franchise": "Franchise D", "model": "XGBoost",  "MAE": 30, "RMSE": 65, "Bias": -3},
+    {"brand": "Brand-I", "franchise": "Franchise E", "model": "Baseline", "MAE": 38, "RMSE": 82, "Bias": -13},
+    {"brand": "Brand-I", "franchise": "Franchise E", "model": "XGBoost",  "MAE": 35, "RMSE": 79, "Bias": -3},
+    {"brand": "Brand-J", "franchise": "Franchise E", "model": "Baseline", "MAE": 45, "RMSE": 93, "Bias": -17},
+    {"brand": "Brand-J", "franchise": "Franchise E", "model": "XGBoost",  "MAE": 43, "RMSE": 87, "Bias": -5},
 ])

@@ -8,7 +8,7 @@ def show_synthetic_data_note():
         "It was generated to match the statistical properties of the real dataset "
         "(same product count, franchise distribution, seasonality shape, and "
         "order-of-magnitude volumes). No real figures or identifiers are used. "
-        "Approximated KPIs are prefixed with ~.",
+        'Approximated KPIs are labeled with "approx." throughout.',
         icon="⚠️",
     )
 
@@ -20,6 +20,6 @@ def show_study_note():
         "pharmaceutical company whose name has been anonymized for confidentiality. "
         "All KPIs shown have been slightly modified (rounded/approximated) to protect "
         "proprietary data. The magnitude and direction of all findings are fully preserved. "
-        "Approximated values are prefixed with ~.",
+        'Approximated values are labeled with "approx." throughout.',
         icon="⚠️",
     )

@@ -1,17 +1,22 @@
-import sys, os
+"""Page 6 — Results, franchise/brand heatmaps, and actionable recommendations."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import pandas as pd  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL, FRANCHISE_COLORS
-from utils.synthetic_data import (
-    BASELINE_MAE, BASELINE_RMSE, BASELINE_BIAS,
-    XGBOOST_MAE,  XGBOOST_RMSE,  XGBOOST_BIAS,
-    FRANCHISE_RESULTS, BRAND_RESULTS,
+from utils.colors import DANGER, SUCCESS, WARNING  # noqa: E402
+from utils.synthetic_data import (  # noqa: E402
+    BASELINE_BIAS, BASELINE_MAE, BASELINE_RMSE,
+    BRAND_RESULTS, FRANCHISE_RESULTS,
+    XGBOOST_BIAS, XGBOOST_MAE, XGBOOST_RMSE,
 )
 
 st.set_page_config(
@@ -90,8 +95,8 @@ def build_heatmap(results_df: pd.DataFrame, group_col: str) -> go.Figure:
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the results page: global KPIs, franchise/brand heatmaps, recommendations."""
     st.markdown("## Results & recommendations")
     st.markdown(
         "Did the ML model deliver — and what should the business do next?"
@@ -188,7 +193,7 @@ def render():
         "Model":    ["Baseline"] * 3 + ["XGBoost"] * 3,
     })
 
-    fig_global = px.grouped_bar = go.Figure()
+    fig_global = go.Figure()
     for model, color in [("Baseline", DANGER), ("XGBoost", SUCCESS)]:
         subset = metrics_chart[metrics_chart["Model"] == model]
         fig_global.add_trace(go.Bar(
@@ -232,14 +237,14 @@ def render():
     with col_fw1:
         st.success(
             "**Where XGBoost wins most:**  \n"
-            "Cardiology and Immunology — stable, high-volume franchises with clear seasonal patterns. "
+            "Franchise A and Franchise D — stable, high-volume franchises with clear seasonal patterns. "
             "The model's demand signals have the most signal to learn from.",
             icon="✅",
         )
     with col_fw2:
         st.warning(
             "**Where improvement is more modest:**  \n"
-            "Solid Tumors and Neuroscience — high-volatility franchises driven by "
+            "Franchise C and Franchise E — high-volatility franchises driven by "
             "exceptional events (clinical decisions, compassionate use, individual patient prescriptions) "
             "that are inherently difficult to forecast from historical data alone.",
             icon="⚠️",
@@ -275,13 +280,13 @@ def render():
     col_bw1, col_bw2 = st.columns(2)
     with col_bw1:
         st.success(
-            "**Brand-A (Cardiology):** MAE improves from ~24% to ~21% — "
+            "**Brand-A (Franchise A):** MAE improves from approx. 24% to approx. 21% — "
             "a high-volume, stable product where the lag features are extremely predictive.",
             icon="🏆",
         )
     with col_bw2:
         st.warning(
-            "**Brand-J (Neuroscience):** MAE moves from ~45% to ~43% — "
+            "**Brand-J (Franchise E):** MAE moves from approx. 45% to approx. 43% — "
             "very high volatility driven by specialist prescribing patterns. "
             "ML helps at the margin, but a safety stock buffer remains essential.",
             icon="⚡",
@@ -307,9 +312,9 @@ def render():
         st.markdown("#### Deploy ML forecasting on high-volume, stable products first")
         st.success(
             "**Lowest risk. Fastest inventory impact.**  \n\n"
-            "Stable products (CV < 50%) represent ~33 out of 43 SKUs and the majority of revenue. "
+            "Stable products (CV < 50%) represent approx. 33 out of 43 SKUs and the majority of revenue. "
             "These are exactly where XGBoost performs best — MAE improvements of 3–5 percentage points "
-            "are reliable, and the bias correction (~−10% → ~−1%) immediately reduces systematic under-ordering.  \n\n"
+            "are reliable, and the bias correction (approx. −10% → approx. −1%) immediately reduces systematic under-ordering.  \n\n"
             "**Action:** Run XGBoost forecasts in parallel with the existing model for 2 planning cycles. "
             "Compare against actuals. Replace the existing model where XGBoost consistently wins.",
             icon="🚀",
@@ -324,7 +329,7 @@ def render():
         st.markdown("#### For high-volatility products, combine ML forecast with a safety stock buffer")
         st.warning(
             "**The model improves accuracy — but cannot fully predict exceptional events.**  \n\n"
-            "High-volatility products (Neuroscience, Solid Tumors) have demand driven by factors "
+            "High-volatility products (Franchise E, Franchise C) have demand driven by factors "
             "outside any historical pattern: single prescriber decisions, compassionate use, "
             "or sudden therapeutic guideline changes.  \n\n"
             "XGBoost still reduces bias and improves average accuracy, but the residual error "
@@ -384,7 +389,7 @@ def render():
 
     with col_sum2:
         st.success(
-            "**Overall:**  \nML forecasting reduces forecast error by **~9%** "
+            "**Overall:**  \nML forecasting reduces forecast error by **approx. 9%** "
             "while systematically correcting the underestimation bias of the existing model.  \n\n"
             "For a portfolio of 43 products, this translates to a **measurable reduction in "
             "safety stock requirements** at the same service level — and a lower risk of "
@@ -409,4 +414,8 @@ def render():
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

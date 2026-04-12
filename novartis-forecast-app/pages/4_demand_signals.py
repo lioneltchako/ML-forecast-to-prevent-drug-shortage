@@ -1,13 +1,18 @@
-import sys, os
+"""Page 4 — Feature engineering: demand signals and their relative importance."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import pandas as pd
-import numpy as np
+# pylint: disable=import-error
+import numpy as np  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
-from utils.synthetic_data import FEATURE_IMPORTANCE
+from utils.colors import DANGER, NEUTRAL, PRIMARY, WARNING  # noqa: E402
+from utils.synthetic_data import FEATURE_IMPORTANCE  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — Demand Signals",
@@ -47,7 +52,7 @@ These are the **lag variables** — past sales values fed directly into the mode
 
 **Why these dominate:** Pharmaceutical demand is highly autocorrelated.
 Knowing what sold last month is by far the best predictor of what will sell next month.
-Combined, historical consumption patterns explain ~70% of total feature importance.
+Combined, historical consumption patterns explain approx. 70% of total feature importance.
 """,
     },
     "Seasonality": {
@@ -118,8 +123,8 @@ Without this context, the model would be forced to treat them identically.
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the demand-signals page: feature categories, sin/cos encoding, and importance chart."""
     st.markdown("## Demand signals")
     st.markdown(
         "What information drives forecast accuracy — "
@@ -149,10 +154,10 @@ directly determines how accurate the forecasts will be.
 In this study, **17 demand signals** were engineered across 4 categories:
 """)
         col_c1, col_c2, col_c3, col_c4 = st.columns(4)
-        col_c1.metric("Historical patterns", "8 signals", "~70% of importance")
-        col_c2.metric("Seasonality",          "3 signals", "~11% of importance")
-        col_c3.metric("Event flags",          "4 signals", "~11% of importance")
-        col_c4.metric("Product context",      "2 signals", "~4% of importance")
+        col_c1.metric("Historical patterns", "8 signals", "approx. 70% of importance")
+        col_c2.metric("Seasonality",          "3 signals", "approx. 11% of importance")
+        col_c3.metric("Event flags",          "4 signals", "approx. 11% of importance")
+        col_c4.metric("Product context",      "2 signals", "approx. 4% of importance")
 
     with col_intro2:
         st.info(
@@ -375,4 +380,8 @@ hour of day, day of week, or month of year.
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()

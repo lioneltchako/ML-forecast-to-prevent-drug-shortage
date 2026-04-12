@@ -1,12 +1,18 @@
-import sys, os
+"""Page 1 — Drug shortage crisis context and problem framing."""
+# pylint: disable=wrong-import-position,use-dict-literal,too-many-locals,too-many-statements
+
+import os
+import sys
+
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-import streamlit as st
-import plotly.graph_objects as go
-import plotly.express as px
-import pandas as pd
+# pylint: disable=import-error
+import pandas as pd  # noqa: E402
+import plotly.express as px  # noqa: E402
+import plotly.graph_objects as go  # noqa: E402
+import streamlit as st  # noqa: E402
 
-from utils.colors import PRIMARY, DANGER, SUCCESS, WARNING, NEUTRAL
+from utils.colors import DANGER, NEUTRAL, PRIMARY, SUCCESS, WARNING  # noqa: E402
 
 st.set_page_config(
     page_title="Drug Forecast AI — The Problem",
@@ -51,16 +57,16 @@ ranking_data = pd.DataFrame({
 # ─────────────────────────────────────────
 # BASELINE KPIs — slightly approximated
 # ─────────────────────────────────────────
-BASELINE_MAE  = "~30%"
-BASELINE_RMSE = "~70%"
-BASELINE_BIAS = "~−10%"
+BASELINE_MAE  = "approx. 30%"
+BASELINE_RMSE = "approx. 70%"
+BASELINE_BIAS = "approx. −10%"
 
 
 # ─────────────────────────────────────────
 # PAGE RENDER
 # ─────────────────────────────────────────
-def render():
-
+def render() -> None:
+    """Render the problem-framing page: shortage trends, causes, and baseline KPIs."""
     st.markdown("## The drug shortage crisis in France")
     st.markdown(
         "Understanding why accurate demand forecasting "
@@ -84,7 +90,7 @@ def render():
     c1.metric("Stock-out signals (2022)",          "3 500",  "+62% vs 2021",                  delta_color="inverse")
     c2.metric("Population affected",               "37%",    "of French patients",             delta_color="off")
     c3.metric("Signals doubled",                   "2×",     "Jan → Aug 2023",                 delta_color="inverse")
-    c4.metric("Drugs at risk of discontinuation",  "~700",   "manufacturers considering exit", delta_color="inverse")
+    c4.metric("Drugs at risk of discontinuation",  "approx. 700",   "manufacturers considering exit", delta_color="inverse")
     st.divider()
 
     # ── Shortage trend ────────────────────
@@ -257,7 +263,7 @@ have created a critical dependency:
   are produced domestically
 - France no longer attracts production
   of innovative, high-value drugs
-- ~700 molecules risk being abandoned
+- Approx. 700 molecules risk being abandoned
   by manufacturers
 """)
     st.divider()
@@ -265,8 +271,8 @@ have created a critical dependency:
     # ── Transition ────────────────────────
     st.markdown("### Where does our case study company fit in?")
     st.markdown("""
-The company studied operates across **8 therapeutic franchises**
-and **60 brands** in France. Its forecasting accuracy directly
+The company studied operates across **multiple therapeutic franchises**
+and **dozens of brands** in France. Its forecasting accuracy directly
 determines whether essential medicines reach patients on time.
 
 During the study period, the existing forecasting model showed:
@@ -296,8 +302,12 @@ During the study period, the existing forecasting model showed:
         "Public sources: ANSM annual reports 2016–2023 · "
         "French Senate inquiry on drug shortages (2023) · "
         "WHO Global medicine shortage report · "
-        "Novartis Annual Report 2022"
+        "Company Annual Report 2022"
     )
 
 
-render()
+try:
+    render()
+except Exception as e:
+    st.error(f"Page failed to render: {e}")
+    st.stop()
