@@ -168,7 +168,7 @@ has the most direct impact on stock-out prevention.
             st.warning(f"Large bias of {bias_calc:+.1f}% — if this were systematic, "
                        "it would require significant safety stock adjustment.")
         elif mae_calc < 20:
-            st.success(f"Good accuracy — {mae_calc:.1f}% MAE is below the ~28% XGBoost benchmark.")
+            st.success(f"Good accuracy — {mae_calc:.1f}% MAE is below the approx. 28% XGBoost benchmark.")
 
     st.divider()
 
@@ -193,7 +193,7 @@ must be set correctly. These are not learned from data — they control *how* th
             "Parameter":         "n_estimators",
             "Supply chain name": "Number of correction rounds",
             "Tuned value":       "300",
-            "Effect":            "More rounds = more accurate, but diminishing returns past ~300",
+            "Effect":            "More rounds = more accurate, but diminishing returns past approx. 300",
         },
         {
             "Parameter":         "max_depth",
@@ -454,7 +454,7 @@ Across the **43 products** in the portfolio:
         )
 
     st.markdown("""
-> **Key takeaway for demand planning at PACCAR / Dynacraft:**
+> **Key takeaway for demand planning:**
 > A 9% improvement in forecast accuracy does not just mean "better numbers."
 > It directly translates to **less buffer stock, less capital tied up in inventory,
 > and the same or better protection against stock-outs** — the exact trade-off
