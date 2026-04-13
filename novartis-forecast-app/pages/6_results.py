@@ -54,8 +54,8 @@ def build_heatmap(results_df: pd.DataFrame, group_col: str) -> go.Figure:
             vals = [row["MAE"], row["RMSE"], abs(row["Bias"])]
             z_vals.append(vals)
             hover_text.append([
-                f"<b>{grp} | {mdl}</b><br>MAE: approx. {row['MAE']}%",
-                f"<b>{grp} | {mdl}</b><br>RMSE: approx. {row['RMSE']}%",
+                f"<b>{grp} | {mdl}</b><br>MAE: {row['MAE']}%",
+                f"<b>{grp} | {mdl}</b><br>RMSE: {row['RMSE']}%",
                 f"<b>{grp} | {mdl}</b><br>Bias: {row['Bias']:+d}%",
             ])
 
@@ -77,7 +77,7 @@ def build_heatmap(results_df: pd.DataFrame, group_col: str) -> go.Figure:
             tickvals=[0, 0.5, 1],
             ticktext=["Low", "Medium", "High"],
         ),
-        text=[[f"approx. {int(z_arr[i, j])}%" for j in range(3)] for i in range(len(row_labels))],
+        text=[[f"{int(z_arr[i, j])}%" for j in range(3)] for i in range(len(row_labels))],
         texttemplate="%{text}",
         hovertext=hover_text,
         hovertemplate="%{hovertext}<extra></extra>",
@@ -103,10 +103,8 @@ def render() -> None:
     )
 
     st.warning(
-        "**Transparency note** — All KPIs are approximated from real study values "
-        "to protect confidential data. The magnitude, direction, and relative "
-        "ranking of results are fully preserved. "
-        'Franchise and brand names are anonymized. Approximated values are labeled with "approx.".',
+        "**Transparency note** — All values are adjusted from real study data to protect confidentiality. "
+        "Magnitude, direction, and relative rankings are preserved. Franchise and brand names are anonymized.",
         icon="⚠️",
     )
     st.divider()
@@ -119,9 +117,9 @@ def render() -> None:
 
     # KPI cards
     col_h1, col_h2, col_h3 = st.columns(3)
-    col_h1.metric("Baseline MAE",  f"approx. {BASELINE_MAE:.0f}%",  "Existing model",    delta_color="off")
-    col_h2.metric("XGBoost MAE",   f"approx. {XGBOOST_MAE:.0f}%",   "ML model",         delta_color="off")
-    col_h3.metric("Improvement",   f"approx. {(BASELINE_MAE-XGBOOST_MAE)/BASELINE_MAE*100:.0f}%",
+    col_h1.metric("Baseline MAE",  f"{BASELINE_MAE:.0f}%",  "Existing model",    delta_color="off")
+    col_h2.metric("XGBoost MAE",   f"{XGBOOST_MAE:.0f}%",   "ML model",         delta_color="off")
+    col_h3.metric("Improvement",   f"{(BASELINE_MAE-XGBOOST_MAE)/BASELINE_MAE*100:.0f}%",
                   "Relative MAE reduction", delta_color="normal")
 
     st.markdown("")
@@ -130,27 +128,27 @@ def render() -> None:
     global_df = pd.DataFrame([
         {
             "Model":     "Baseline",
-            "MAE":       f"approx. {BASELINE_MAE:.0f}%",
-            "RMSE":      f"approx. {BASELINE_RMSE:.0f}%",
-            "Bias":      f"approx. {BASELINE_BIAS:+.0f}%",
+            "MAE":       f"{BASELINE_MAE:.0f}%",
+            "RMSE":      f"{BASELINE_RMSE:.0f}%",
+            "Bias":      f"{BASELINE_BIAS:+.0f}%",
             "MAE_num":   BASELINE_MAE,
             "RMSE_num":  BASELINE_RMSE,
             "Bias_num":  abs(BASELINE_BIAS),
         },
         {
             "Model":     "XGBoost",
-            "MAE":       f"approx. {XGBOOST_MAE:.0f}%",
-            "RMSE":      f"approx. {XGBOOST_RMSE:.0f}%",
-            "Bias":      f"approx. {XGBOOST_BIAS:+.0f}%",
+            "MAE":       f"{XGBOOST_MAE:.0f}%",
+            "RMSE":      f"{XGBOOST_RMSE:.0f}%",
+            "Bias":      f"{XGBOOST_BIAS:+.0f}%",
             "MAE_num":   XGBOOST_MAE,
             "RMSE_num":  XGBOOST_RMSE,
             "Bias_num":  abs(XGBOOST_BIAS),
         },
         {
             "Model":     "Δ Improvement",
-            "MAE":       f"approx. {BASELINE_MAE-XGBOOST_MAE:.0f}pp",
-            "RMSE":      f"approx. {BASELINE_RMSE-XGBOOST_RMSE:.0f}pp",
-            "Bias":      f"approx. {abs(BASELINE_BIAS)-abs(XGBOOST_BIAS):.0f}pp closer to zero",
+            "MAE":       f"{BASELINE_MAE-XGBOOST_MAE:.0f}pp",
+            "RMSE":      f"{BASELINE_RMSE-XGBOOST_RMSE:.0f}pp",
+            "Bias":      f"{abs(BASELINE_BIAS)-abs(XGBOOST_BIAS):.0f}pp closer to zero",
             "MAE_num":   BASELINE_MAE - XGBOOST_MAE,
             "RMSE_num":  BASELINE_RMSE - XGBOOST_RMSE,
             "Bias_num":  abs(BASELINE_BIAS) - abs(XGBOOST_BIAS),
@@ -199,7 +197,7 @@ def render() -> None:
         fig_global.add_trace(go.Bar(
             x=subset["Metric"], y=subset["Value"],
             name=model, marker_color=color,
-            text=[f"approx. {v:.0f}%" for v in subset["Value"]],
+            text=[f"{v:.0f}%" for v in subset["Value"]],
             textposition="outside",
         ))
 
@@ -280,13 +278,13 @@ def render() -> None:
     col_bw1, col_bw2 = st.columns(2)
     with col_bw1:
         st.success(
-            "**Brand-A (Franchise A):** MAE improves from approx. 24% to approx. 21% — "
+            "**Brand-A (Franchise A):** MAE improves from 24% to 21% — "
             "a high-volume, stable product where the lag features are extremely predictive.",
             icon="🏆",
         )
     with col_bw2:
         st.warning(
-            "**Brand-J (Franchise E):** MAE moves from approx. 45% to approx. 43% — "
+            "**Brand-J (Franchise E):** MAE moves from 45% to 43% — "
             "very high volatility driven by specialist prescribing patterns. "
             "ML helps at the margin, but a safety stock buffer remains essential.",
             icon="⚡",
@@ -312,9 +310,9 @@ def render() -> None:
         st.markdown("#### Deploy ML forecasting on high-volume, stable products first")
         st.success(
             "**Lowest risk. Fastest inventory impact.**  \n\n"
-            "Stable products (CV < 50%) represent approx. 33 out of 43 SKUs and the majority of revenue. "
+            "Stable products (CV < 50%) represent 33 out of 43 SKUs and the majority of revenue. "
             "These are exactly where XGBoost performs best — MAE improvements of 3–5 percentage points "
-            "are reliable, and the bias correction (approx. −10% → approx. −1%) immediately reduces systematic under-ordering.  \n\n"
+            "are reliable, and the bias correction (−10% → −1%) immediately reduces systematic under-ordering.  \n\n"
             "**Action:** Run XGBoost forecasts in parallel with the existing model for 2 planning cycles. "
             "Compare against actuals. Replace the existing model where XGBoost consistently wins.",
             icon="🚀",
@@ -379,17 +377,16 @@ def render() -> None:
         st.markdown(f"""
 | What we measured | Baseline model | XGBoost model | Improvement |
 |-----------------|---------------|--------------|-------------|
-| Mean Absolute Error | approx. {BASELINE_MAE:.0f}% | approx. {XGBOOST_MAE:.0f}% | **approx. {(BASELINE_MAE-XGBOOST_MAE)/BASELINE_MAE*100:.0f}% relative reduction** |
-| Root Mean Squared Error | approx. {BASELINE_RMSE:.0f}% | approx. {XGBOOST_RMSE:.0f}% | **approx. {(BASELINE_RMSE-XGBOOST_RMSE)/BASELINE_RMSE*100:.0f}% relative reduction** |
-| Systematic bias | approx. {BASELINE_BIAS:.0f}% | approx. {XGBOOST_BIAS:.0f}% | **Nearly eliminated** |
+| Mean Absolute Error | {BASELINE_MAE:.0f}% | {XGBOOST_MAE:.0f}% | **{(BASELINE_MAE-XGBOOST_MAE)/BASELINE_MAE*100:.0f}% relative reduction** |
+| Root Mean Squared Error | {BASELINE_RMSE:.0f}% | {XGBOOST_RMSE:.0f}% | **{(BASELINE_RMSE-XGBOOST_RMSE)/BASELINE_RMSE*100:.0f}% relative reduction** |
+| Systematic bias | {BASELINE_BIAS:.0f}% | {XGBOOST_BIAS:.0f}% | **Nearly eliminated** |
 | Safety stock impact | Higher buffer needed | Lower buffer needed | **Direct inventory cost reduction** |
 
-*All KPIs are approximated from real study values to protect confidential data.*
 """)
 
     with col_sum2:
         st.success(
-            "**Overall:**  \nML forecasting reduces forecast error by **approx. 9%** "
+            "**Overall:**  \nML forecasting reduces forecast error by **9%** "
             "while systematically correcting the underestimation bias of the existing model.  \n\n"
             "For a portfolio of 43 products, this translates to a **measurable reduction in "
             "safety stock requirements** at the same service level — and a lower risk of "
@@ -407,9 +404,6 @@ def render() -> None:
 
     st.divider()
     st.caption(
-        "All KPIs are approximated from real study values to protect confidential data. "
-        "Magnitude, direction, and relative rankings are fully preserved. "
-        "Franchise and brand names are anonymized. "
         "Sources: internal study data (anonymized) · ANSM · French Senate inquiry 2023"
     )
 

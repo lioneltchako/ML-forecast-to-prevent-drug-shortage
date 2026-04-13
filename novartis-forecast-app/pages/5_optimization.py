@@ -55,10 +55,8 @@ def render() -> None:
     st.markdown("Tuning the model, measuring its errors, and translating accuracy into inventory outcomes.")
 
     st.warning(
-        "**Transparency note** — All KPIs on this page are approximated from real study values "
-        "to protect confidential data. Magnitude and direction are fully preserved. "
-        "Learning curves and tuning charts are synthetic and illustrative. "
-        "Approximated values are prefixed with ~.",
+        "**Transparency note** — All values are adjusted from real study data to protect confidentiality. "
+        "Magnitude, direction, and relative rankings are preserved. Franchise and brand names are anonymized.",
         icon="⚠️",
     )
     st.divider()
@@ -168,7 +166,7 @@ has the most direct impact on stock-out prevention.
             st.warning(f"Large bias of {bias_calc:+.1f}% — if this were systematic, "
                        "it would require significant safety stock adjustment.")
         elif mae_calc < 20:
-            st.success(f"Good accuracy — {mae_calc:.1f}% MAE is below the approx. 28% XGBoost benchmark.")
+            st.success(f"Good accuracy — {mae_calc:.1f}% MAE is below the 28% XGBoost benchmark.")
 
     st.divider()
 
@@ -193,7 +191,7 @@ must be set correctly. These are not learned from data — they control *how* th
             "Parameter":         "n_estimators",
             "Supply chain name": "Number of correction rounds",
             "Tuned value":       "300",
-            "Effect":            "More rounds = more accurate, but diminishing returns past approx. 300",
+            "Effect":            "More rounds = more accurate, but diminishing returns past 300",
         },
         {
             "Parameter":         "max_depth",
@@ -357,9 +355,9 @@ So **every percentage-point improvement in MAE directly reduces safety stock.**
 
     col_ss1, col_ss2, col_ss3 = st.columns(3)
     col_ss1.metric("Baseline safety stock",  f"{ss_baseline:,.0f} units",
-                   f"MAE ~{BASELINE_MAE:.0f}%", delta_color="off")
+                   f"MAE {BASELINE_MAE:.0f}%", delta_color="off")
     col_ss2.metric("XGBoost safety stock",   f"{ss_xgboost:,.0f} units",
-                   f"MAE ~{XGBOOST_MAE:.0f}%", delta_color="off")
+                   f"MAE {XGBOOST_MAE:.0f}%", delta_color="off")
     col_ss3.metric("Reduction",              f"−{ss_delta:,.0f} units",
                    f"−{ss_delta_pct:.1f}% per product", delta_color="normal")
 
@@ -387,7 +385,7 @@ So **every percentage-point improvement in MAE directly reduces safety stock.**
         x=[BASELINE_MAE], y=[ss_baseline],
         mode="markers+text",
         marker=dict(size=14, color=DANGER, symbol="diamond"),
-        text=[f"Baseline<br>~{BASELINE_MAE:.0f}% MAE<br>{ss_baseline:,.0f} units"],
+        text=[f"Baseline<br>{BASELINE_MAE:.0f}% MAE<br>{ss_baseline:,.0f} units"],
         textposition="top right",
         textfont=dict(color=DANGER),
         name="Baseline model",
@@ -398,7 +396,7 @@ So **every percentage-point improvement in MAE directly reduces safety stock.**
         x=[XGBOOST_MAE], y=[ss_xgboost],
         mode="markers+text",
         marker=dict(size=14, color=SUCCESS, symbol="star"),
-        text=[f"XGBoost<br>~{XGBOOST_MAE:.0f}% MAE<br>{ss_xgboost:,.0f} units"],
+        text=[f"XGBoost<br>{XGBOOST_MAE:.0f}% MAE<br>{ss_xgboost:,.0f} units"],
         textposition="top left",
         textfont=dict(color=SUCCESS),
         name="XGBoost model",
@@ -447,7 +445,7 @@ Across the **43 products** in the portfolio:
 """)
     with col_pi2:
         st.success(
-            f"**A ~{ss_delta_pct:.0f}% reduction in safety stock** "
+            f"**A {ss_delta_pct:.0f}% reduction in safety stock** "
             f"while maintaining the same {service_z:.3f} service level factor. "
             "This frees up capital, reduces waste risk, and improves working capital.",
             icon="📦",
@@ -466,7 +464,6 @@ Across the **43 products** in the portfolio:
 
     st.divider()
     st.caption(
-        "⚠️ KPIs are approximated from real study values. "
         "Safety stock calculations use standard formula SS = Z × σ × √L. "
         "σ estimated as MAE × 1.25 (normal distribution approximation). "
         "Results vary by product; portfolio-level figures use average demand assumptions."

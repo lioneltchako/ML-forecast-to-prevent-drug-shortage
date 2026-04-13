@@ -13,6 +13,13 @@ st.set_page_config(
 
 st.markdown("## Drug Demand Forecasting")
 st.markdown("## Preventing Medicine Shortages with Machine Learning")
+
+st.warning(
+    "**Transparency note** — All values are adjusted from real study data to protect confidentiality. "
+    "Magnitude, direction, and relative rankings are preserved. Franchise and brand names are anonymized.",
+    icon="⚠️",
+)
+
 st.divider()
 
 st.markdown(
@@ -43,7 +50,7 @@ with c3:
     )
 with c4:
     st.success(
-        "**The Result**  \nApprox. 9% improvement in forecast accuracy · "
+        "**The Result**  \n9% improvement in forecast accuracy · "
         "directly reducing safety stock needs and stock-out risk.",
         icon="🎯",
     )
@@ -70,9 +77,9 @@ This dashboard walks through the full study end-to-end:
 """)
 
 with col_n:
-    st.metric(label="Forecast error improvement", value="approx. 9%", delta="MAE reduction vs baseline",
+    st.metric(label="Forecast error improvement", value="9%", delta="MAE reduction vs baseline",
               delta_color="normal")
-    st.metric(label="Bias correction", value="approx. −10% → approx. −1%", delta="Systematic underestimation fixed",
+    st.metric(label="Bias correction", value="−10% → −1%", delta="Systematic underestimation fixed",
               delta_color="normal")
     st.metric(label="Products covered", value="43", delta="across 5 franchises",
               delta_color="off")

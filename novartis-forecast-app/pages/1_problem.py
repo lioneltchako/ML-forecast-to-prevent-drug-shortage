@@ -57,9 +57,9 @@ ranking_data = pd.DataFrame({
 # ─────────────────────────────────────────
 # BASELINE KPIs — slightly approximated
 # ─────────────────────────────────────────
-BASELINE_MAE  = "approx. 30%"
-BASELINE_RMSE = "approx. 70%"
-BASELINE_BIAS = "approx. −10%"
+BASELINE_MAE  = "30%"
+BASELINE_RMSE = "70%"
+BASELINE_BIAS = "−10%"
 
 
 # ─────────────────────────────────────────
@@ -74,12 +74,8 @@ def render() -> None:
     )
 
     st.warning(
-        "**Transparency note** — This study was conducted at a major French "
-        "pharmaceutical company whose name has been anonymized for confidentiality. "
-        "Baseline model KPIs shown at the bottom of this page have been slightly "
-        "modified (rounded/approximated) to protect proprietary data. "
-        "The magnitude and direction of all findings are fully preserved. "
-        "All other statistics on this page come from public sources.",
+        "**Transparency note** — All values are adjusted from real study data to protect confidentiality. "
+        "Magnitude, direction, and relative rankings are preserved. Franchise and brand names are anonymized.",
         icon="⚠️",
     )
     st.divider()
@@ -90,7 +86,7 @@ def render() -> None:
     c1.metric("Stock-out signals (2022)",          "3 500",  "+62% vs 2021",                  delta_color="inverse")
     c2.metric("Population affected",               "37%",    "of French patients",             delta_color="off")
     c3.metric("Signals doubled",                   "2×",     "Jan → Aug 2023",                 delta_color="inverse")
-    c4.metric("Drugs at risk of discontinuation",  "approx. 700",   "manufacturers considering exit", delta_color="inverse")
+    c4.metric("Drugs at risk of discontinuation",  "700",   "manufacturers considering exit", delta_color="inverse")
     st.divider()
 
     # ── Shortage trend ────────────────────
@@ -263,7 +259,7 @@ have created a critical dependency:
   are produced domestically
 - France no longer attracts production
   of innovative, high-value drugs
-- Approx. 700 molecules risk being abandoned
+- 700 molecules risk being abandoned
   by manufacturers
 """)
     st.divider()
@@ -283,11 +279,7 @@ During the study period, the existing forecasting model showed:
     col_n2.metric("Baseline RMSE", BASELINE_RMSE, "Root mean squared error",   delta_color="off")
     col_n3.metric("Baseline Bias", BASELINE_BIAS, "Systematic underestimation", delta_color="inverse")
 
-    st.caption(
-        "⚠️ These KPIs are approximated from real study values "
-        "to protect confidential data. "
-        "Magnitude and direction are fully preserved."
-    )
+
 
     st.markdown("""
 > The baseline model was **systematically underestimating demand**,

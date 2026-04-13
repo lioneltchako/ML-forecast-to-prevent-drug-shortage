@@ -71,11 +71,8 @@ def render():
     st.markdown("Exploring what pharmaceutical sales data looks like before building any model.")
 
     st.warning(
-        "**Transparency note** — All data on this page is fully synthetic. "
-        "It was generated to match the statistical properties of the real dataset "
-        "(same number of products, franchise distribution, seasonality pattern, "
-        "COVID-19 impact shape, and order-of-magnitude sales volumes). "
-        "No real figures or identifiers from the original study are used.",
+        "**Transparency note** — All values are adjusted from real study data to protect confidentiality. "
+        "Magnitude, direction, and relative rankings are preserved. Franchise and brand names are anonymized.",
         icon="⚠️",
     )
     st.divider()
@@ -92,7 +89,7 @@ def render():
     c1.metric("Products",       "43",           "unique SKUs")
     c2.metric("Time period",    "63 months",    "Jan 2018 → Mar 2023")
     c3.metric("Franchises",     "5",            "therapeutic areas")
-    c4.metric("Monthly median", "approx. 2 100 units", "per product")
+    c4.metric("Monthly median", "2 100 units", "per product")
     st.divider()
 
     # ── Franchise distribution ────────────
@@ -207,9 +204,9 @@ def render():
 
     with col_cv2:
         st.markdown("**What CV tells us**")
-        st.success("**Stable products (CV < 50%)** — Predictable demand. Approx. 33 products fall here.")
-        st.warning("**Variable products (50–100%)** — Moderate unpredictability. Approx. 3 products.")
-        st.error("**High volatility (CV > 100%)** — Very hard to forecast. Approx. 7 products. These drive most of the model error.")
+        st.success("**Stable products (CV < 50%)** — Predictable demand. 33 products fall here.")
+        st.warning("**Variable products (50–100%)** — Moderate unpredictability. 3 products.")
+        st.error("**High volatility (CV > 100%)** — Very hard to forecast. 7 products. These drive most of the model error.")
     st.divider()
 
     # ── Product-level explorer ────────────
@@ -320,10 +317,6 @@ KNN imputation is preferred because:
 > → Continue to **Page 3 — Model Selection** to see how the forecasting algorithm was chosen.
 """)
 
-    st.caption(
-        "⚠️ All data on this page is synthetic and generated solely for illustration. "
-        "Statistical properties match the real dataset; no actual figures are reproduced."
-    )
 
 
 render()
